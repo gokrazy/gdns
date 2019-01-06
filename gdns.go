@@ -6,10 +6,11 @@
 // http://timestamps.gokrazy/ in your browser.
 //
 // E.g.:
-//  gokr-packer -update=yes -hostname=gokrazy github.com/gokrazy/timestamps github.com/gokrazy/gdns
-//  # gdns’s transparent proxies are located within fdf5:3606:2a21::/48:
-//  sudo ip -6 addr add fdf5:3606:2a21::1/48 dev enp0s31f6
-//  curl http://timestamps.gokrazy/metrics
+//  % gokr-packer -update=yes -hostname=gokrazy github.com/gokrazy/timestamps github.com/gokrazy/gdns
+//  router7# mkdir /perm/radvd
+//  router7# echo '[{"IP":"fdf5:3606:2a21::","Mask":"//////////8AAAAAAAAAAA=="}]' > /perm/radvd/prefixes.json
+//  router7# killall radvd
+//  % curl http://timestamps.gokrazy/metrics
 package main
 
 import (
@@ -21,6 +22,7 @@ import (
 	"net/url"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/rtr7/dyndns"
 	"github.com/vishvananda/netlink"
@@ -30,7 +32,7 @@ import (
 )
 
 // ulaPrefix is a RFC4193 unique local IPv6 unicast address prefix
-const ulaPrefix = "fdf5:3606:2a21:" // prefix length /48
+const ulaPrefix = "fdf5:3606:2a21:0:" // prefix length /64
 
 func mustParseCIDR(s string) *net.IPNet {
 	_, net, err := net.ParseCIDR(s)
@@ -88,6 +90,7 @@ func logic() error {
 	if err != nil {
 		return err
 	}
+	eui = eui[strings.IndexByte(eui, ':'):]
 
 	addrs, err := listenaddrs(nil)
 	if err != nil {
@@ -106,7 +109,7 @@ func logic() error {
 		}
 
 		port := strconv.Itoa(int(addr.Port))
-		proxyaddr := ulaPrefix + port + ":" + eui
+		proxyaddr := ulaPrefix + port + eui
 
 		cmdline := filepath.Base(string(addr.Cmdline))
 		if cmdline == "init" {
