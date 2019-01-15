@@ -15,20 +15,20 @@ import (
 
 const (
 	_ = iota
-	TCP_ESTABLISHED
-	TCP_SYN_SENT
-	TCP_SYN_RECV
-	TCP_FIN_WAIT1
-	TCP_FIN_WAIT2
-	TCP_TIME_WAIT
-	TCP_CLOSE
-	TCP_CLOSE_WAIT
-	TCP_LAST_ACK
-	TCP_LISTEN
-	TCP_CLOSING /* now a valid state */
+	tcp_established
+	tcp_syn_sent
+	tcp_syn_recv
+	tcp_fin_wait1
+	tcp_fin_wait2
+	tcp_time_wait
+	tcp_close
+	tcp_close_wait
+	tcp_last_ack
+	tcp_listen
+	tcp_closing /* now a valid state */
 )
 
-const SOCK_DIAG_BY_FAMILY = 20
+const sock_diag_by_family = 20
 
 type inetDiagSockid struct {
 	IdiagSport  uint16
@@ -80,7 +80,7 @@ func listenaddrs(nlcfg *netlink.Config) ([]listenAddr, error) {
 		dreq := inetDiagReqV2{
 			SdiagFamily:   family,
 			SdiagProtocol: unix.IPPROTO_TCP,
-			IdiagStates:   1<<TCP_CLOSE | 1<<TCP_LISTEN,
+			IdiagStates:   1<<tcp_close | 1<<tcp_listen,
 		}
 		var buf bytes.Buffer
 		if err := binary.Write(&buf, binary.LittleEndian, &dreq); err != nil {
@@ -89,7 +89,7 @@ func listenaddrs(nlcfg *netlink.Config) ([]listenAddr, error) {
 
 		req := netlink.Message{
 			Header: netlink.Header{
-				Type:  netlink.HeaderType(SOCK_DIAG_BY_FAMILY),
+				Type:  netlink.HeaderType(sock_diag_by_family),
 				Flags: netlink.HeaderFlagsRequest | /*netlink.HeaderFlagsAcknowledge | */ netlink.HeaderFlagsDump,
 			},
 			Data: buf.Bytes(),
@@ -152,7 +152,7 @@ func listenaddrs(nlcfg *netlink.Config) ([]listenAddr, error) {
 		fdfis, err := ioutil.ReadDir(fddir)
 		if err != nil {
 			continue // TODO: only on permission denied
-			return nil, err
+			// return nil, err
 		}
 		for _, fdfi := range fdfis {
 			if fdfi.Mode()&os.ModeSymlink == 0 {
