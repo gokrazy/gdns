@@ -90,7 +90,7 @@ func listenaddrs(nlcfg *netlink.Config) ([]listenAddr, error) {
 		req := netlink.Message{
 			Header: netlink.Header{
 				Type:  netlink.HeaderType(sock_diag_by_family),
-				Flags: netlink.HeaderFlagsRequest | /*netlink.HeaderFlagsAcknowledge | */ netlink.HeaderFlagsDump,
+				Flags: netlink.Request | /*netlink.Acknowledge | */ netlink.Dump,
 			},
 			Data: buf.Bytes(),
 		}
