@@ -162,14 +162,28 @@ func logic() error {
 		ln, err := net.Listen("tcp", net.JoinHostPort(proxyaddr, "80"))
 		if err != nil {
 			log.Print(err)
+			continue
 		}
 
+		target, err := url.Parse("http://[::1]:" + port)
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+
+		localAddr, err := net.ResolveTCPAddr("tcp6", "[fdf5:3606:2a21:0:9115:b9ff:fe4c:8ec4]:0")
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+		proxy := httputil.NewSingleHostReverseProxy(target)
+		proxy.Transport = &http.Transport{
+			Dial: (&net.Dialer{
+				LocalAddr: localAddr,
+			}).Dial,
+		}
 		eg.Go(func() error {
-			target, err := url.Parse("http://localhost:" + port)
-			if err != nil {
-				return err
-			}
-			return http.Serve(ln, httputil.NewSingleHostReverseProxy(target))
+			return http.Serve(ln, proxy)
 		})
 
 		if err := dyndns.SetSubname(name, net.ParseIP(proxyaddr)); err != nil {
