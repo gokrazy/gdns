@@ -171,7 +171,7 @@ func logic() error {
 			continue
 		}
 
-		localAddr, err := net.ResolveTCPAddr("tcp6", "[fdf5:3606:2a21:0:9115:b9ff:fe4c:8ec4]:0")
+		localAddr, err := net.ResolveTCPAddr("tcp6", net.JoinHostPort(proxyaddr, "0"))
 		if err != nil {
 			log.Print(err)
 			continue
