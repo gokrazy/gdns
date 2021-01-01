@@ -108,7 +108,7 @@ func logic() error {
 			continue
 		}
 
-		port := strconv.Itoa(int(addr.Port))
+		port := fmt.Sprintf("%x", addr.Port)
 		proxyaddr := ulaPrefix + port + eui
 
 		cmdline := filepath.Base(string(addr.Cmdline))
@@ -165,7 +165,7 @@ func logic() error {
 			continue
 		}
 
-		target, err := url.Parse("http://[::1]:" + port)
+		target, err := url.Parse("http://[::1]:" + fmt.Sprintf("%d", addr.Port))
 		if err != nil {
 			log.Print(err)
 			continue
