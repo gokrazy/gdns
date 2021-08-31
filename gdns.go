@@ -146,9 +146,9 @@ func logic() error {
 				// Skip duplicate address detection so that we can immediately
 				// listen on this address after configuring:
 				addr.Flags |= unix.IFA_F_NODAD
-				link, err := netlink.LinkByName("eth0") // TODO
+				link, err := netlink.LinkByName("lan0") // TODO
 				if err != nil {
-					link, err = netlink.LinkByName("lan0") // TODO
+					link, err = netlink.LinkByName("eth0") // TODO
 					if err != nil {
 						return fmt.Errorf("netlink.LinkByName(eth0): %v", err)
 					}
