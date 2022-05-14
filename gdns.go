@@ -54,41 +54,42 @@ func last64(ip net.IP) string {
 		b[14], b[15])
 }
 
-func ethernetEUI64() (string, error) {
-	ifaces, err := net.Interfaces()
+func ethernetEUI64(interfaceName string) (string, error) {
+	iface, err := net.InterfaceByName(interfaceName)
 	if err != nil {
 		return "", err
 	}
 
-	for _, i := range ifaces {
-		if i.Flags&net.FlagUp != net.FlagUp {
-			continue
-		}
-		addrs, err := i.Addrs()
+	if iface.Flags&net.FlagUp != net.FlagUp {
+		return "", fmt.Errorf("interface not up")
+	}
+	addrs, err := iface.Addrs()
+	if err != nil {
+		return "", err
+	}
+
+	for _, a := range addrs {
+		ipaddr, _, err := net.ParseCIDR(a.String())
 		if err != nil {
 			return "", err
 		}
 
-		for _, a := range addrs {
-			ipaddr, _, err := net.ParseCIDR(a.String())
-			if err != nil {
-				return "", err
-			}
-
-			if ipv6LinkLocal.Contains(ipaddr) {
-				return last64(ipaddr), nil
-			}
+		if ipv6LinkLocal.Contains(ipaddr) {
+			return last64(ipaddr), nil
 		}
 	}
-	return "", fmt.Errorf("no ethernet interface found")
+	return "", fmt.Errorf("no link local address found")
 }
 
 var listeners = make(map[string]bool)
 
 func logic() error {
-	eui, err := ethernetEUI64()
+	eui, err := ethernetEUI64("lan0")
 	if err != nil {
-		return err
+		eui, err = ethernetEUI64("eth0")
+		if err != nil {
+			return err
+		}
 	}
 	eui = eui[strings.IndexByte(eui, ':'):]
 
