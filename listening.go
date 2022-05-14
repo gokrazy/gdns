@@ -3,11 +3,13 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
+	"syscall"
 
 	"github.com/mdlayher/netlink"
 	"golang.org/x/sys/unix"
@@ -66,6 +68,21 @@ type listenAddr struct {
 	Port    uint16
 	Inode   uint32
 	Cmdline string
+}
+
+func processGone(err error) bool {
+	// ReadFile can encounter either ENOENT or ESRCH, depending on when
+	// exactly the process exits.
+	var errno syscall.Errno
+	if errors.As(err, &errno) {
+		if errno == syscall.ESRCH {
+			return true
+		}
+	}
+	if os.IsNotExist(err) {
+		return true
+	}
+	return false
 }
 
 func listenaddrs(nlcfg *netlink.Config) ([]listenAddr, error) {
@@ -136,7 +153,7 @@ func listenaddrs(nlcfg *netlink.Config) ([]listenAddr, error) {
 		}
 		cmdline, err := ioutil.ReadFile(filepath.Join("/proc", fi.Name(), "cmdline"))
 		if err != nil {
-			if os.IsNotExist(err) {
+			if processGone(err) {
 				continue
 			}
 			return nil, err
@@ -160,7 +177,7 @@ func listenaddrs(nlcfg *netlink.Config) ([]listenAddr, error) {
 			}
 			target, err := os.Readlink(filepath.Join(fddir, fdfi.Name()))
 			if err != nil {
-				if os.IsNotExist(err) {
+				if processGone(err) {
 					continue
 				}
 				return nil, err
