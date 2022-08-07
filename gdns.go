@@ -6,11 +6,12 @@
 // http://timestamps.gokrazy/ in your browser.
 //
 // E.g.:
-//  % gokr-packer -update=yes -hostname=gokrazy github.com/gokrazy/timestamps github.com/gokrazy/gdns
-//  router7# mkdir /perm/radvd
-//  router7# echo '[{"IP":"fdf5:3606:2a21::","Mask":"//////////8AAAAAAAAAAA=="}]' > /perm/radvd/prefixes.json
-//  router7# killall radvd
-//  % curl http://timestamps.gokrazy/metrics
+//
+//	% gokr-packer -update=yes -hostname=gokrazy github.com/gokrazy/timestamps github.com/gokrazy/gdns
+//	router7# mkdir /perm/radvd
+//	router7# echo '[{"IP":"fdf5:3606:2a21::","Mask":"//////////8AAAAAAAAAAA=="}]' > /perm/radvd/prefixes.json
+//	router7# killall radvd
+//	% curl http://timestamps.gokrazy/metrics
 package main
 
 import (
