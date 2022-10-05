@@ -3,7 +3,7 @@ module github.com/gokrazy/gdns
 go 1.16
 
 require (
-	github.com/google/go-cmp v0.5.7
+	github.com/google/go-cmp v0.5.9
 	github.com/mdlayher/netlink v1.6.0
 	github.com/mdlayher/socket v0.2.1 // indirect
 	github.com/rtr7/dyndns v0.0.0-20201230142821-834b78e8b1b7
