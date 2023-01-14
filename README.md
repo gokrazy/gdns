@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/gokrazy/gdns.svg?branch=master)](https://travis-ci.org/gokrazy/gdns)
+[![GitHub Actions CI](https://github.com/gokrazy/gdns/actions/workflows/push.yml/badge.svg)](https://github.com/gokrazy/gdns/actions/workflows/push.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gokrazy/gdns)](https://goreportcard.com/report/github.com/gokrazy/gdns)
 
 # Overview
@@ -21,10 +21,11 @@ router7# echo '[{"IP":"fdf5:3606:2a21::","Mask":"//////////8AAAAAAAAAAA=="}]' > 
 router7# killall radvd
 ```
 
-Then, include gdns in your gokrazy installation(s):
+Then, add gdns to your gokrazy instance:
 
 ```
-% gokr-packer -update=yes -hostname=gokrazy github.com/gokrazy/timestamps github.com/gokrazy/gdns
+% gok add github.com/gokrazy/gdns
+% gok update
 % sleep 20
 % curl http://timestamps.gokrazy/metrics
 ```
